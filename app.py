@@ -35,9 +35,58 @@ if page == "Home":
 
 # ---------- CALCULATOR PAGE ----------
 elif page == "Carbon Calculator":
-    st.title("🧮 Carbon Calculator")
-    st.info("Carbon calculator will be added in the next step.")
+    st.title("🧮 Household Carbon Calculator")
 
+    st.markdown("### Basic Household Details")
+
+    members = st.number_input("Number of family members", min_value=1, step=1)
+
+    st.markdown("### ⚡ Electricity Usage")
+    electricity = st.selectbox(
+        "Monthly electricity consumption (units)",
+        ["<100", "100–200", "200–300", "300–500", ">500"]
+    )
+
+    elec_units = {
+        "<100": 75,
+        "100–200": 150,
+        "200–300": 250,
+        "300–500": 400,
+        ">500": 600
+    }[electricity]
+
+    electricity_co2 = elec_units * 0.82 * 12
+
+    st.markdown("### 🍳 Cooking (LPG)")
+    lpg = st.number_input("LPG cylinders per month", min_value=0.0, step=0.1)
+    cooking_co2 = lpg * 42 * 12
+
+    st.markdown("### 💧 Water Usage")
+    water = st.number_input("Water usage per day (litres)", min_value=0.0)
+    water_co2 = water * 0.0003 * 365
+
+    st.markdown("### 🚗 Transport (per person per month)")
+    bus = st.number_input("Bus travel (km)", min_value=0.0)
+    tw = st.number_input("Two-wheeler / Car travel (km)", min_value=0.0)
+
+    transport_co2 = (bus * 0.05 + tw * 0.12) * 12 * members
+
+    # ---------- TOTAL ----------
+    total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
+
+    st.markdown("---")
+    if st.button("Calculate Carbon Footprint"):
+        st.success(f"🌍 Total Annual Carbon Emission: *{total_co2:.2f} kg CO₂/year*")
+
+        per_capita = total_co2 / members
+        st.info(f"👤 Per Capita Emission: *{per_capita:.2f} kg CO₂/year*")
+
+        if total_co2 < 2000:
+            st.success("🌱 LOW CARBON HOUSEHOLD")
+        elif total_co2 < 5000:
+            st.warning("🟡 MODERATE CARBON HOUSEHOLD")
+        else:
+            st.error("🔴 HIGH CARBON HOUSEHOLD")
 # ---------- SOLUTIONS PAGE ----------
 elif page == "Solutions":
     st.title("🌿 Carbon Reduction Solutions")
