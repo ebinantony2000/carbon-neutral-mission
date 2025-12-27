@@ -1,5 +1,5 @@
 import streamlit as st
-
+import matplotlib.pyplot as plt
 st.set_page_config(
     page_title="Carbon Neutral Mission",
     layout="wide"
@@ -75,18 +75,31 @@ elif page == "Carbon Calculator":
     total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
 
     st.markdown("---")
-    if st.button("Calculate Carbon Footprint"):
-        st.success(f"🌍 Total Annual Carbon Emission: *{total_co2:.2f} kg CO₂/year*")
+  if st.button("Calculate Carbon Footprint"):
+    st.success(f"🌍 Total Annual Carbon Emission: *{total_co2:.2f} kg CO₂/year*")
 
-        per_capita = total_co2 / members
-        st.info(f"👤 Per Capita Emission: *{per_capita:.2f} kg CO₂/year*")
+    per_capita = total_co2 / members
+    st.info(f"👤 Per Capita Emission: *{per_capita:.2f} kg CO₂/year*")
 
-        if total_co2 < 2000:
-            st.success("🌱 LOW CARBON HOUSEHOLD")
-        elif total_co2 < 5000:
-            st.warning("🟡 MODERATE CARBON HOUSEHOLD")
-        else:
-            st.error("🔴 HIGH CARBON HOUSEHOLD")
+    if total_co2 < 2000:
+        st.success("🌱 LOW CARBON HOUSEHOLD")
+    elif total_co2 < 5000:
+        st.warning("🟡 MODERATE CARBON HOUSEHOLD")
+    else:
+        st.error("🔴 HIGH CARBON HOUSEHOLD")
+
+    # ---------- BAR CHART ----------
+    st.markdown("### 📊 Category-wise CO₂ Emissions")
+
+    categories = ["Electricity", "Cooking", "Water", "Transport"]
+    values = [electricity_co2, cooking_co2, water_co2, transport_co2]
+
+    fig, ax = plt.subplots()
+    ax.bar(categories, values)
+    ax.set_ylabel("CO₂ Emission (kg/year)")
+    ax.set_title("Household Carbon Emission Breakdown")
+
+    st.pyplot(fig)
 # ---------- SOLUTIONS PAGE ----------
 elif page == "Solutions":
     st.title("🌿 Carbon Reduction Solutions")
