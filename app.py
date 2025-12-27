@@ -76,6 +76,7 @@ elif page == "Carbon Calculator":
 
     st.markdown("---")
   if st.button("Calculate Carbon Footprint"):
+
     st.success(f"🌍 Total Annual Carbon Emission: *{total_co2:.2f} kg CO₂/year*")
 
     per_capita = total_co2 / members
@@ -88,7 +89,6 @@ elif page == "Carbon Calculator":
     else:
         st.error("🔴 HIGH CARBON HOUSEHOLD")
 
-    # ---------- BAR CHART ----------
     st.markdown("### 📊 Category-wise CO₂ Emissions")
 
     categories = ["Electricity", "Cooking", "Water", "Transport"]
