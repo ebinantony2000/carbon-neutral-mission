@@ -75,11 +75,18 @@ elif page == "Carbon Calculator":
     total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
 
     st.markdown("---")
-    if st.button("Calculate Carbon Footprint"):
-    st.success(f"🌍 Total Annual Carbon Emission: *{total_co2:.2f} kg CO₂/year*")
+   if st.button("Calculate Carbon Footprint"):
 
+    electricity_co2 = electricity * 12 * 0.82
+    cooking_co2 = cooking_gas * 12 * 3.0
+    water_co2 = water * 12 * 0.0003
+    transport_co2 = transport * 12 * 0.21
+
+    total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
     per_capita = total_co2 / members
-    st.info(f"👤 Per Capita Emission: *{per_capita:.2f} kg CO₂/year*")
+
+    st.success(f"🌍 Total Annual Carbon Emission: {total_co2:.2f} kg CO₂/year")
+    st.info(f"👤 Per Capita Emission: {per_capita:.2f} kg CO₂/year")
 
     if total_co2 < 2000:
         st.success("🌱 LOW CARBON HOUSEHOLD")
@@ -88,6 +95,17 @@ elif page == "Carbon Calculator":
     else:
         st.error("🔴 HIGH CARBON HOUSEHOLD")
 
+    st.subheader("📊 Emission Breakdown")
+
+    categories = ["Electricity", "Cooking", "Water", "Transport"]
+    values = [electricity_co2, cooking_co2, water_co2, transport_co2]
+
+    fig, ax = plt.subplots()
+    ax.bar(categories, values)
+    ax.set_ylabel("CO₂ Emission (kg/year)")
+    ax.set_title("Household Carbon Emission Breakdown")
+
+    st.pyplot(fig)
     # ---------- BAR CHART ----------
     st.markdown("### 📊 Category-wise CO₂ Emissions")
 
