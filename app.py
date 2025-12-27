@@ -5,48 +5,69 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------- HEADER ----------
-st.title("🌱 Carbon Neutral Mission")
-st.subheader("A Socially Relevant Project")
+# ---------- SIDEBAR NAVIGATION ----------
+page = st.sidebar.selectbox(
+    "Navigate",
+    ["Home", "Carbon Calculator", "Solutions", "Our Team"]
+)
 
-st.markdown("---")
+# ---------- HOME PAGE ----------
+if page == "Home":
+    st.title("🌱 Carbon Neutral Mission")
+    st.subheader("A Socially Relevant Project")
 
-# ---------- INTRO ----------
-st.markdown("""
-### 🌍 About the Project
+    st.markdown("""
+    ### 🌍 About the Project
+    The *Carbon Neutral Mission* aims to assess and reduce
+    household carbon emissions by promoting sustainable practices.
 
-The *Carbon Neutral Mission* aims to measure, analyze, and reduce
-household carbon emissions by promoting sustainable lifestyle choices.
+    This web platform helps users understand their *carbon footprint*
+    and encourages eco-friendly lifestyle choices.
+    """)
 
-This project helps people understand their *carbon footprint* and
-encourages eco-friendly alternatives.
-""")
+    st.markdown("""
+    ### 🎯 Objectives
+    - Measure household carbon emissions  
+    - Create awareness about sustainability  
+    - Promote carbon-neutral living  
+    - Support climate action initiatives  
+    """)
 
-# ---------- OBJECTIVES ----------
-st.markdown("""
-### 🎯 Objectives
-- Calculate household carbon emissions
-- Create awareness about sustainability
-- Promote carbon-neutral practices
-- Support India’s climate action goals
-""")
+# ---------- CALCULATOR PAGE ----------
+elif page == "Carbon Calculator":
+    st.title("🧮 Carbon Calculator")
+    st.info("Carbon calculator will be added in the next step.")
 
-# ---------- COLLEGE & TEAM ----------
-st.markdown("""
-### 🏫 Project Details
+# ---------- SOLUTIONS PAGE ----------
+elif page == "Solutions":
+    st.title("🌿 Carbon Reduction Solutions")
 
-*College:* TKM College of Engineering  
-*Department:* Civil Engineering  
+    st.markdown("""
+    ### Simple Actions for a Low-Carbon Lifestyle
+    - Use LED bulbs and energy-efficient appliances  
+    - Reduce LPG usage and adopt induction cooking  
+    - Use public transport, cycling, or carpooling  
+    - Practice rainwater harvesting  
+    - Compost biodegradable waste  
+    - Plant and maintain trees  
+    """)
 
-*Team Members:*
-- Athullya PR  
-- Ebin Antony  
-- Prathul K  
-- Anupama Raj  
-- Jareesh IS  
-- Shamil AN  
-""")
+# ---------- TEAM PAGE ----------
+elif page == "Our Team":
+    st.title("👥 Project Team")
 
-# ---------- FOOTER ----------
-st.markdown("---")
-st.caption("© 2025 Carbon Neutral Mission | Civil Engineering | TKMCE")
+    st.markdown("""
+    *TKM College of Engineering*  
+    Department of Civil Engineering  
+
+    *Team Members*
+    - Athullya PR  
+    - Ebin Antony  
+    - Prathul K  
+    - Anupama Raj  
+    - Jareesh IS  
+    - Shamil AN  
+    """)
+
+    st.markdown("---")
+    st.caption("© 2025 Carbon Neutral Mission | Civil Engineering | TKMCE")
