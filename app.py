@@ -21,18 +21,51 @@ page = st.sidebar.selectbox(
 )
 
 # ================= HOME =================
+# ---------- HOME PAGE ----------
 if page == "Home":
-    st.title("🌍 Carbon Neutral Mission")
-    st.subheader("Towards a Carbon Neutral Community")
 
-    st.markdown("""
-    The *Carbon Neutral Mission* aims to assess and reduce household
-    carbon emissions by promoting sustainable practices.
+    st.markdown("<h1 style='text-align: center;'>🌱 Carbon Neutral Mission</h1>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: gray;'>Towards a Sustainable & Low-Carbon Future</h4>", unsafe_allow_html=True)
 
-    This platform helps citizens understand their *carbon footprint*
-    and take informed climate-friendly actions.
+    st.image(
+        "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+        use_column_width=True,
+        caption="Protecting the planet starts at home"
+    )
+
+    st.divider()
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("🌍 About the Project")
+        st.write("""
+        The *Carbon Neutral Mission* is a socially relevant initiative aimed at
+        measuring and reducing *household carbon emissions*.
+
+        This platform helps families understand their *carbon footprint*
+        and encourages sustainable living practices.
+        """)
+
+    with col2:
+        st.subheader("🎯 Project Objectives")
+        st.markdown("""
+        - Assess household carbon emissions  
+        - Promote awareness on climate change  
+        - Encourage eco-friendly lifestyle choices  
+        - Support carbon-neutral community initiatives  
+        """)
+
+    st.divider()
+
+    st.subheader("💡 Why Carbon Neutrality Matters?")
+    st.write("""
+    Carbon emissions from households contribute significantly to climate change.
+    By adopting *energy-efficient, water-conserving, and low-carbon practices*,
+    communities can reduce environmental impact and move towards a *sustainable future*.
     """)
 
+    st.info("🌿 Small changes at home can create a big impact on the planet.")
 # ================= CALCULATOR =================
 elif page == "Carbon Calculator":
 
