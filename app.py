@@ -1,100 +1,174 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import io
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4
+from datetime import datetime
+
+# ================= PAGE CONFIG =================
 st.set_page_config(
     page_title="Carbon Neutral Mission",
+    page_icon="🌱",
     layout="wide"
 )
 
-# ---------- SIDEBAR NAVIGATION ----------
+# ================= SIDEBAR =================
+st.sidebar.title("🌱 Carbon Neutral Mission")
 page = st.sidebar.selectbox(
     "Navigate",
     ["Home", "Carbon Calculator", "Solutions", "Our Team"]
 )
 
-# ---------- HOME PAGE ----------
+# ================= HOME =================
 if page == "Home":
-    st.title("🌱 Carbon Neutral Mission")
-    st.subheader("A Socially Relevant Project")
+    st.title("🌍 Carbon Neutral Mission")
+    st.subheader("Towards a Carbon Neutral Community")
 
     st.markdown("""
-    ### 🌍 About the Project
-    The *Carbon Neutral Mission* aims to assess and reduce
-    household carbon emissions by promoting sustainable practices.
+    The *Carbon Neutral Mission* aims to assess and reduce household
+    carbon emissions by promoting sustainable practices.
 
-    This web platform helps users understand their *carbon footprint*
-    and encourages eco-friendly lifestyle choices.
+    This platform helps citizens understand their *carbon footprint*
+    and take informed climate-friendly actions.
     """)
 
-    st.markdown("""
-    ### 🎯 Objectives
-    - Measure household carbon emissions  
-    - Create awareness about sustainability  
-    - Promote carbon-neutral living  
-    - Support climate action initiatives  
-    """)
-
-# ---------- CALCULATOR PAGE ----------
+# ================= CALCULATOR =================
 elif page == "Carbon Calculator":
-    st.title("🧮 Carbon Calculator")
 
+    st.title("🏠 Household Carbon Footprint Calculator")
+
+    # ---------- HOUSE DETAILS ----------
     st.subheader("House Details")
     house_name = st.text_input("House Name")
     owner_name = st.text_input("Owner Name")
-    house_number = st.text_input("House Number")
-    members = st.number_input("Number of Family Members", min_value=1, step=1)
+    house_no = st.text_input("House Number")
+    family_members = st.number_input("Family Members", min_value=1, value=1)
 
-    st.subheader("Monthly Consumption")
-    electricity = st.number_input("Electricity (kWh)", min_value=0.0)
-    cooking_gas = st.number_input("Cooking Gas (kg)", min_value=0.0)
-    water = st.number_input("Water Usage (litres)", min_value=0.0)
-    transport = st.number_input("Transport Distance (km)", min_value=0.0)
+    # ---------- ELECTRICITY & COOKING ----------
+    st.subheader("Electricity & Cooking")
+    electricity_units = st.number_input("Monthly Grid Electricity Units", min_value=0, value=150)
+    solar_units = st.number_input("Monthly Solar Units", min_value=0, value=0)
+    lpg_cylinders = st.number_input("LPG Cylinders per Month", min_value=0, value=1)
 
+    # ---------- WATER & TRANSPORT ----------
+    st.subheader("Water & Transport")
+    water_day = st.number_input("Water Usage per Day (litres)", min_value=0, value=100)
+
+    bus = st.number_input("Monthly Bus Travel per Person (km)", min_value=0, value=0)
+    train = st.number_input("Monthly Train Travel per Person (km)", min_value=0, value=0)
+    tw = st.number_input("Monthly Two-wheeler / Car Travel per Person (km)", min_value=0, value=0)
+    flight = st.number_input("Monthly Flight Travel per Person (km)", min_value=0, value=0)
+
+    # ---------- WASTE & DIGITAL ----------
+    st.subheader("Waste & Digital Usage")
+    bio_waste = st.number_input("Biodegradable Waste (kg/day)", min_value=0, value=1)
+    nonbio_waste = st.number_input("Non-biodegradable Waste (kg/day)", min_value=0, value=1)
+    mobiles = st.number_input("Number of Mobile Phones", min_value=0, value=1)
+    ewaste = st.number_input("E-waste Items per Year", min_value=0, value=1)
+
+    # ---------- GREEN OFFSET ----------
+    st.subheader("Green Actions")
+    trees = st.number_input("Trees Maintained / Planted", min_value=0, value=0)
+
+    # ---------- CALCULATION ----------
     if st.button("Calculate Carbon Footprint"):
 
-        electricity_co2 = electricity * 12 * 0.82
-        cooking_co2 = cooking_gas * 12 * 3.0
-        water_co2 = water * 12 * 0.0003
-        transport_co2 = transport * 12 * 0.21
+        net_units = max(electricity_units - solar_units, 0)
+        electricity_CO2 = net_units * 0.82 * 12
+        cooking_CO2 = lpg_cylinders * 42 * 12
+        water_CO2 = water_day * 0.0003 * 365
+        transport_CO2 = (bus*0.05 + train*0.04 + tw*0.12 + flight*0.15) * 12 * family_members
+        waste_CO2 = (bio_waste*0.18 + nonbio_waste*0.35) * 365
+        digital_CO2 = mobiles*25 + ewaste*15
+        offset = trees * 21
 
-        total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
-        per_capita = total_co2 / members
+        gross_CO2 = (
+            electricity_CO2 + cooking_CO2 + water_CO2 +
+            transport_CO2 + waste_CO2 + digital_CO2
+        )
 
-        st.success(f"🌍 Total Annual CO₂ Emission: {total_co2:.2f} kg/year")
-        st.info(f"👤 Per Capita CO₂ Emission: {per_capita:.2f} kg/year")
-        st.subheader("📊 Carbon Emission Breakdown")
+        net_CO2 = gross_CO2 - offset
+        per_capita = net_CO2 / family_members
 
-        categories = ["Electricity", "Cooking", "Water", "Transport"]
-        values = [electricity_co2, cooking_co2, water_co2, transport_co2]
+        labels = ["Electricity", "Cooking", "Water", "Transport", "Waste", "Digital"]
+        values = [electricity_CO2, cooking_CO2, water_CO2, transport_CO2, waste_CO2, digital_CO2]
 
+        highest_source = labels[values.index(max(values))]
+
+        suggestions = {
+            "Electricity": "Use LED bulbs and adopt solar power.",
+            "Cooking": "Reduce LPG usage and switch to induction cooking.",
+            "Water": "Install rainwater harvesting systems.",
+            "Transport": "Use public transport or car pooling.",
+            "Waste": "Compost biodegradable waste and recycle plastics.",
+            "Digital": "Reduce device replacement and recycle e-waste."
+        }
+
+        # ---------- RESULTS ----------
+        st.subheader("📊 Carbon Footprint Results")
+        st.write(f"*Gross CO₂ Emission:* {gross_CO2:.1f} kg/year")
+        st.write(f"*Green Offset:* {offset:.1f} kg/year")
+        st.write(f"*Net CO₂ Emission:* {net_CO2:.1f} kg/year")
+        st.write(f"*Per Capita CO₂:* {per_capita:.1f} kg/year")
+        st.write(f"*Highest Emission Source:* {highest_source}")
+        st.write(f"*Suggested Action:* {suggestions[highest_source]}")
+
+        # ---------- BAR CHART ----------
         fig, ax = plt.subplots()
-        ax.bar(categories, values)
+        ax.bar(labels, values)
         ax.set_ylabel("CO₂ Emission (kg/year)")
-        ax.set_title("Category-wise Carbon Emissions")
-
+        ax.set_title("Household Carbon Emission Breakdown")
         st.pyplot(fig)
-# ---------- SOLUTIONS PAGE ----------
+
+        # ---------- PDF REPORT ----------
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        styles = getSampleStyleSheet()
+        story = []
+
+        story.append(Paragraph("<b>HOUSEHOLD CARBON EMISSION REPORT</b>", styles["Title"]))
+        story.append(Spacer(1, 10))
+        story.append(Paragraph(f"House Name: {house_name}", styles["Normal"]))
+        story.append(Paragraph(f"Owner Name: {owner_name}", styles["Normal"]))
+        story.append(Paragraph(f"House Number: {house_no}", styles["Normal"]))
+        story.append(Paragraph(f"Date: {datetime.now().strftime('%d-%m-%Y')}", styles["Normal"]))
+        story.append(Spacer(1, 10))
+
+        story.append(Paragraph(f"Gross CO₂ Emission: {gross_CO2:.1f} kg/year", styles["Normal"]))
+        story.append(Paragraph(f"Net CO₂ Emission: {net_CO2:.1f} kg/year", styles["Normal"]))
+        story.append(Paragraph(f"Per Capita CO₂: {per_capita:.1f} kg/year", styles["Normal"]))
+        story.append(Paragraph(f"Highest Source: {highest_source}", styles["Normal"]))
+        story.append(Paragraph(f"Suggestion: {suggestions[highest_source]}", styles["Normal"]))
+
+        doc.build(story)
+        buffer.seek(0)
+
+        st.download_button(
+            "📥 Download PDF Report",
+            buffer,
+            "Household_Carbon_Report.pdf",
+            "application/pdf"
+        )
+
+# ================= SOLUTIONS =================
 elif page == "Solutions":
     st.title("🌿 Carbon Reduction Solutions")
-
     st.markdown("""
-    ### Simple Actions for a Low-Carbon Lifestyle
-    - Use LED bulbs and energy-efficient appliances  
-    - Reduce LPG usage and adopt induction cooking  
-    - Use public transport, cycling, or carpooling  
-    - Practice rainwater harvesting  
-    - Compost biodegradable waste  
-    - Plant and maintain trees  
+    - Use energy-efficient appliances  
+    - Adopt renewable energy  
+    - Reduce water wastage  
+    - Use sustainable transport  
+    - Practice waste segregation  
+    - Plant trees regularly  
     """)
 
-# ---------- TEAM PAGE ----------
+# ================= TEAM =================
 elif page == "Our Team":
     st.title("👥 Project Team")
-
     st.markdown("""
-    *TKM College of Engineering*  
-    Department of Civil Engineering  
+    *TKM College of Engineering – Civil Engineering*
 
-    *Team Members*
     - Athullya PR  
     - Ebin Antony  
     - Prathul K  
@@ -102,6 +176,3 @@ elif page == "Our Team":
     - Jareesh IS  
     - Shamil AN  
     """)
-
-    st.markdown("---")
-    st.caption("© 2025 Carbon Neutral Mission | Civil Engineering | TKMCE")
