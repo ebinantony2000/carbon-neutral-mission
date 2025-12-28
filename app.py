@@ -65,7 +65,7 @@ if page == "Home":
     st.info("🌿 Small changes at home can create a big impact on the planet.")
 
 # ================== CALCULATOR PAGE ==================
-elif page == "Carbon Calculator":
+if page == "Carbon Calculator":
     st.title("🧮 Household Carbon Calculator")
     st.info("Estimate your annual household carbon footprint below.")
 
@@ -221,7 +221,7 @@ st.download_button(
     mime="application/pdf"
 )
 # ================== WHY CARBON NEUTRAL? ==================
-elif page == "Why Carbon Neutral?":
+if page == "Why Carbon Neutral?":
     st.title("🌿 Why Carbon Neutral?")
     st.subheader("Understanding Carbon Footprint and Its Impact")
     st.image(
@@ -250,7 +250,7 @@ elif page == "Why Carbon Neutral?":
     st.info("Reducing household carbon emissions is a contribution to a sustainable future!")
 
 # ================== SOLUTIONS ==================
-elif page == "Solutions":
+if page == "Solutions":
     st.title("🌿 Carbon Reduction Solutions")
     st.markdown("""
     ### Simple Actions for a Low-Carbon Lifestyle
@@ -263,7 +263,7 @@ elif page == "Solutions":
     """)
 
 # ================== TEAM ==================
-elif page == "Our Team":
+if page == "Our Team":
     st.title("👥 Project Team")
     st.markdown("""
     *TKM College of Engineering*  
