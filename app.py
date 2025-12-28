@@ -96,7 +96,7 @@ elif page == "Carbon Calculator":
     st.subheader("🌳 Green Actions")
     trees = st.number_input("🌳 Trees Maintained / Planted", min_value=0, value=0)
 
-    # Calculation
+    # ---------------- CALCULATION & CHART ----------------
     if st.button("Calculate Carbon Footprint"):
         net_units = max(electricity_units - solar_units, 0)
         electricity_CO2 = net_units * 0.82 * 12
@@ -135,7 +135,81 @@ elif page == "Carbon Calculator":
         ax.set_title("Household Carbon Emission Breakdown")
         st.pyplot(fig)
 
-        st.success("✅ PDF Report is ready below!")
+        # ---------------- PDF REPORT ----------------
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.colors import green, orange, red
+        import io
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        story = []
+        styles = getSampleStyleSheet()
+
+        # Section 1: House Information
+        story.append(Paragraph("<b>HOUSE INFORMATION</b>", styles["Heading2"]))
+        story.append(Paragraph(f"House Name: {house_name}", styles["Normal"]))
+        story.append(Paragraph(f"Owner Name: {owner_name}", styles["Normal"]))
+        story.append(Paragraph(f"House Number: {house_no}", styles["Normal"]))
+        story.append(Paragraph(f"Date: {datetime.now().strftime('%d-%m-%Y')}", styles["Normal"]))
+        story.append(Spacer(1,12))
+
+        # Section 2: Annual Carbon Emissions
+        story.append(Paragraph("<b>ANNUAL CARBON EMISSIONS (kg/year)</b>", styles["Heading2"]))
+        for i, label in enumerate(labels):
+            story.append(Paragraph(f"{label}: {values[i]:.1f}", styles["Normal"]))
+        story.append(Spacer(1,12))
+        story.append(Paragraph(f"Net CO₂ Emissions: {net_CO2:.1f} kg/year", styles["Normal"]))
+        story.append(Spacer(1,12))
+
+        # Section 3: Emission Contribution (%)
+        story.append(Paragraph("<b>EMISSIONS CONTRIBUTION (%)</b>", styles["Heading2"]))
+        total = sum(values)
+        for i, label in enumerate(labels):
+            story.append(Paragraph(f"{label}: {values[i]/total*100:.1f} %", styles["Normal"]))
+        story.append(Spacer(1,12))
+        story.append(Paragraph(f"Overall Rating: {rating}", styles["Heading3"]))
+        story.append(Spacer(1,12))
+
+        # Color coding for rating
+        if rating.startswith("LOW"):
+            color = green
+        elif rating.startswith("MODERATE"):
+            color = orange
+        else:
+            color = red
+
+        # Section 4: Key Suggestion
+        story.append(Paragraph("<b>KEY SUGGESTION</b>", styles["Heading2"]))
+        suggestions = {
+            "Electricity": "Adopt LED lighting and solar energy.",
+            "Cooking": "Reduce LPG usage and switch to induction/biogas.",
+            "Water": "Install rainwater harvesting systems.",
+            "Transport": "Prefer public transport, cycling, or carpooling.",
+            "Waste": "Compost bio-waste and recycle non-biodegradable waste.",
+            "Digital": "Reduce frequent device replacement and recycle e-waste."
+        }
+        highest_source = labels[values.index(max(values))]
+        story.append(Paragraph(f"{highest_source}: {suggestions[highest_source]}", styles["Normal"]))
+        story.append(Spacer(1,12))
+
+        # Section 5: Conclusion
+        story.append(Paragraph("<b>CONCLUSION</b>", styles["Heading2"]))
+        story.append(Paragraph(
+            "Measuring and reducing household carbon emissions is essential for "
+            "a sustainable future. Following suggested actions can significantly "
+            "reduce the carbon footprint of your home.", styles["Normal"]))
+
+        doc.build(story)
+        buffer.seek(0)
+
+        st.download_button(
+            label="📥 Download PDF Report",
+            data=buffer,
+            file_name=f"Household_Carbon_Report_{house_name}.pdf",
+            mime="application/pdf"
+        )
 
 # ================== WHY CARBON NEUTRAL? ==================
 elif page == "Why Carbon Neutral?":
