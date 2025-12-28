@@ -1,145 +1,23 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-st.set_page_config(
-    page_title="Carbon Neutral Mission",
-    layout="wide"
-)
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+import io
 
-# ---------- SIDEBAR NAVIGATION ----------
-page = st.sidebar.selectbox(
-    "Navigate",
-    ["Home", "Carbon Calculator", "Solutions", "Our Team"]
-)
+st.set_page_config(page_title="Carbon Neutral Mission", layout="wide")
 
-# ---------- HOME PAGE ----------
+st.sidebar.title("🌱 Carbon Neutral Mission")
+page = st.sidebar.radio("Navigation", ["Home", "Carbon Calculator"])
+
+
+# ---------------- HOME PAGE ----------------
 if page == "Home":
-    st.title("🌱 Carbon Neutral Mission")
-    st.subheader("A Socially Relevant Project")
+    st.title("🌍 Carbon Neutral Mission")
 
     st.markdown("""
-    ### 🌍 About the Project
-    The *Carbon Neutral Mission* aims to assess and reduce
-    household carbon emissions by promoting sustainable practices.
+    ### A Socially Relevant Engineering Project
 
-    This web platform helps users understand their *carbon footprint*
-    and encourages eco-friendly lifestyle choices.
-    """)
-
-    st.markdown("""
-    ### 🎯 Objectives
-    - Measure household carbon emissions  
-    - Create awareness about sustainability  
-    - Promote carbon-neutral living  
-    - Support climate action initiatives  
-    """)
-
-# ---------- CALCULATOR PAGE ----------
-elif page == "Carbon Calculator":
-    st.title("🧮 Household Carbon Calculator")
-
-    st.markdown("### Basic Household Details")
-
-    members = st.number_input("Number of family members", min_value=1, step=1)
-
-    st.markdown("### ⚡ Electricity Usage")
-    electricity = st.selectbox(
-        "Monthly electricity consumption (units)",
-        ["<100", "100–200", "200–300", "300–500", ">500"]
-    )
-
-    elec_units = {
-        "<100": 75,
-        "100–200": 150,
-        "200–300": 250,
-        "300–500": 400,
-        ">500": 600
-    }[electricity]
-
-    electricity_co2 = elec_units * 0.82 * 12
-
-    st.markdown("### 🍳 Cooking (LPG)")
-    lpg = st.number_input("LPG cylinders per month", min_value=0.0, step=0.1)
-    cooking_co2 = lpg * 42 * 12
-
-    st.markdown("### 💧 Water Usage")
-    water = st.number_input("Water usage per day (litres)", min_value=0.0)
-    water_co2 = water * 0.0003 * 365
-
-    st.markdown("### 🚗 Transport (per person per month)")
-    bus = st.number_input("Bus travel (km)", min_value=0.0)
-    tw = st.number_input("Two-wheeler / Car travel (km)", min_value=0.0)
-
-    transport_co2 = (bus * 0.05 + tw * 0.12) * 12 * members
-
-    # ---------- TOTAL ----------
-    total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
-
-    st.markdown("---")
-   if st.button("Calculate Carbon Footprint"):
-
-    electricity_co2 = electricity * 12 * 0.82
-    cooking_co2 = cooking_gas * 12 * 3.0
-    water_co2 = water * 12 * 0.0003
-    transport_co2 = transport * 12 * 0.21
-
-    total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
-    per_capita = total_co2 / members
-
-    st.success(f"🌍 Total Annual Carbon Emission: {total_co2:.2f} kg CO₂/year")
-    st.info(f"👤 Per Capita Emission: {per_capita:.2f} kg CO₂/year")
-
-    if total_co2 < 2000:
-        st.success("🌱 LOW CARBON HOUSEHOLD")
-    elif total_co2 < 5000:
-        st.warning("🟡 MODERATE CARBON HOUSEHOLD")
-    else:
-        st.error("🔴 HIGH CARBON HOUSEHOLD")
-
-    st.subheader("📊 Emission Breakdown")
-
-    categories = ["Electricity", "Cooking", "Water", "Transport"]
-    values = [electricity_co2, cooking_co2, water_co2, transport_co2]
-
-    fig, ax = plt.subplots()
-    ax.bar(categories, values)
-    ax.set_ylabel("CO₂ Emission (kg/year)")
-    ax.set_title("Household Carbon Emission Breakdown")
-
-    st.pyplot(fig)
-    # ---------- BAR CHART ----------
-    st.markdown("### 📊 Category-wise CO₂ Emissions")
-
-    categories = ["Electricity", "Cooking", "Water", "Transport"]
-    values = [electricity_co2, cooking_co2, water_co2, transport_co2]
-
-    fig, ax = plt.subplots()
-    ax.bar(categories, values)
-    ax.set_ylabel("CO₂ Emission (kg/year)")
-    ax.set_title("Household Carbon Emission Breakdown")
-
-    st.pyplot(fig)
-
-# ---------- SOLUTIONS PAGE ----------
-elif page == "Solutions":
-    st.title("🌿 Carbon Reduction Solutions")
-
-    st.markdown("""
-    ### Simple Actions for a Low-Carbon Lifestyle
-    - Use LED bulbs and energy-efficient appliances  
-    - Reduce LPG usage and adopt induction cooking  
-    - Use public transport, cycling, or carpooling  
-    - Practice rainwater harvesting  
-    - Compost biodegradable waste  
-    - Plant and maintain trees  
-    """)
-
-# ---------- TEAM PAGE ----------
-elif page == "Our Team":
-    st.title("👥 Project Team")
-
-    st.markdown("""
-    *TKM College of Engineering*  
-    Department of Civil Engineering  
+    *TKM College of Engineering – Civil Engineering*
 
     *Team Members*
     - Athullya PR  
@@ -150,5 +28,60 @@ elif page == "Our Team":
     - Shamil AN  
     """)
 
-    st.markdown("---")
-    st.caption("© 2025 Carbon Neutral Mission | Civil Engineering | TKMCE")
+
+# ---------------- CALCULATOR PAGE ----------------
+if page == "Carbon Calculator":
+
+    st.title("🏠 Household Carbon Footprint Calculator")
+
+    house_name = st.text_input("House Name")
+    owner_name = st.text_input("Owner Name")
+    house_number = st.text_input("House Number")
+    members = st.number_input("Family Members", min_value=1, step=1)
+
+    electricity = st.number_input("Monthly Electricity (kWh)", min_value=0.0)
+    cooking_gas = st.number_input("Monthly Cooking Gas (kg)", min_value=0.0)
+    water = st.number_input("Monthly Water Usage (litres)", min_value=0.0)
+    transport = st.number_input("Monthly Transport Distance (km)", min_value=0.0)
+
+    if st.button("Calculate Carbon Footprint"):
+
+        electricity_co2 = electricity * 12 * 0.82
+        cooking_co2 = cooking_gas * 12 * 3.0
+        water_co2 = water * 12 * 0.0003
+        transport_co2 = transport * 12 * 0.21
+
+        total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
+        per_capita = total_co2 / members
+
+        st.success(f"Total CO₂ Emission: {total_co2:.2f} kg/year")
+        st.info(f"Per Capita CO₂: {per_capita:.2f} kg/year")
+
+        categories = ["Electricity", "Cooking", "Water", "Transport"]
+        values = [electricity_co2, cooking_co2, water_co2, transport_co2]
+
+        fig, ax = plt.subplots()
+        ax.bar(categories, values)
+        ax.set_ylabel("kg CO₂ / year")
+        ax.set_title("Carbon Emission Breakdown")
+
+        st.pyplot(fig)
+
+        buffer = io.BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+
+        pdf.drawString(50, 800, "HOUSEHOLD CARBON EMISSION REPORT")
+        pdf.drawString(50, 760, f"House Name: {house_name}")
+        pdf.drawString(50, 740, f"Owner Name: {owner_name}")
+        pdf.drawString(50, 720, f"House Number: {house_number}")
+        pdf.drawString(50, 700, f"Total CO₂: {total_co2:.2f} kg/year")
+
+        pdf.save()
+        buffer.seek(0)
+
+        st.download_button(
+            "Download PDF Report",
+            buffer,
+            "Carbon_Report.pdf",
+            "application/pdf"
+        )
