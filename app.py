@@ -17,9 +17,8 @@ st.set_page_config(
 st.sidebar.title("🌱 Carbon Neutral Mission")
 page = st.sidebar.selectbox(
     "Navigate",
-    ["Home", "Carbon Calculator", "Solutions", "Our Team"]
+    ["Home", "Carbon Calculator", "Why Carbon Neutral?", "Solutions", "Our Team"]
 )
-
 # ================= HOME =================
 # ---------- HOME PAGE ----------
 if page == "Home":
@@ -248,7 +247,46 @@ elif page == "Carbon Calculator":
             "Household_Carbon_Report.pdf",
             "application/pdf"
         )
+# ---------- WHY CARBON NEUTRAL? ----------
+elif page == "Why Carbon Neutral?":
 
+    st.title("🌿 Why Carbon Neutral?")
+    st.subheader("Understanding Carbon Footprint and Its Impact")
+
+    st.image(
+        "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
+        use_column_width=True,
+        caption="Every action at home counts towards the planet"
+    )
+
+    st.divider()
+
+    st.markdown("""
+    *Carbon footprint* is the total greenhouse gas emissions caused directly or indirectly 
+    by human activities, measured in kilograms of CO₂ per year.
+    """)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("🏠 Household Impact")
+        st.write("""
+        - Residential electricity and cooking fuels are major contributors  
+        - Transportation adds significant emissions  
+        - Waste management and e-waste affect carbon footprint  
+        """)
+
+    with col2:
+        st.subheader("🌎 Global Context")
+        st.write("""
+        - Climate change is accelerated by CO₂ emissions  
+        - Reducing household carbon footprint contributes to local and global sustainability  
+        - Small steps at home lead to measurable environmental benefits  
+        """)
+
+    st.divider()
+    st.subheader("💡 Takeaway")
+    st.info("Reducing your household carbon emissions is not just a personal action, it's a contribution to a sustainable future!")
 # ================= SOLUTIONS =================
 elif page == "Solutions":
     st.title("🌿 Carbon Reduction Solutions")
