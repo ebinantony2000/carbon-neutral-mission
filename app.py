@@ -49,6 +49,19 @@ elif page == "Carbon Calculator":
     water = st.number_input("Water Usage (litres)", min_value=0.0)
     transport = st.number_input("Transport Distance (km)", min_value=0.0)
 
+    if st.button("Calculate Carbon Footprint"):
+
+        electricity_co2 = electricity * 12 * 0.82
+        cooking_co2 = cooking_gas * 12 * 3.0
+        water_co2 = water * 12 * 0.0003
+        transport_co2 = transport * 12 * 0.21
+
+        total_co2 = electricity_co2 + cooking_co2 + water_co2 + transport_co2
+        per_capita = total_co2 / members
+
+        st.success(f"🌍 Total Annual CO₂ Emission: {total_co2:.2f} kg/year")
+        st.info(f"👤 Per Capita CO₂ Emission: {per_capita:.2f} kg/year")
+
 # ---------- SOLUTIONS PAGE ----------
 elif page == "Solutions":
     st.title("🌿 Carbon Reduction Solutions")
