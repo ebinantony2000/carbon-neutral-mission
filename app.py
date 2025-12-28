@@ -36,7 +36,18 @@ if page == "Home":
 # ---------- CALCULATOR PAGE ----------
 elif page == "Carbon Calculator":
     st.title("🧮 Carbon Calculator")
-    st.info("Carbon calculator will be added in the next step.")
+
+    st.subheader("House Details")
+    house_name = st.text_input("House Name")
+    owner_name = st.text_input("Owner Name")
+    house_number = st.text_input("House Number")
+    members = st.number_input("Number of Family Members", min_value=1, step=1)
+
+    st.subheader("Monthly Consumption")
+    electricity = st.number_input("Electricity (kWh)", min_value=0.0)
+    cooking_gas = st.number_input("Cooking Gas (kg)", min_value=0.0)
+    water = st.number_input("Water Usage (litres)", min_value=0.0)
+    transport = st.number_input("Transport Distance (km)", min_value=0.0)
 
 # ---------- SOLUTIONS PAGE ----------
 elif page == "Solutions":
