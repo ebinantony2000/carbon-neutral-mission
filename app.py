@@ -122,24 +122,89 @@ elif page == "Carbon Calculator":
         st.pyplot(fig)
 
         # ---------- PDF REPORT ----------
+       # ---------- PERCENTAGE CONTRIBUTION ----------
+        percent = {
+            "Electricity": (electricity_CO2 / gross_CO2) * 100,
+            "Cooking": (cooking_CO2 / gross_CO2) * 100,
+            "Water": (water_CO2 / gross_CO2) * 100,
+            "Transport": (transport_CO2 / gross_CO2) * 100,
+            "Waste": (waste_CO2 / gross_CO2) * 100,
+            "Digital": (digital_CO2 / gross_CO2) * 100,
+        }
+
+        # ---------- RATING ----------
+        if net_CO2 < 3000:
+            rating = "LOW CARBON HOUSEHOLD"
+            rating_color = "green"
+        elif net_CO2 < 6000:
+            rating = "MODERATE CARBON HOUSEHOLD"
+            rating_color = "orange"
+        else:
+            rating = "HIGH CARBON HOUSEHOLD"
+            rating_color = "red"
+
+        # ---------- PDF REPORT ----------
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=A4)
         styles = getSampleStyleSheet()
         story = []
 
+        # Title
         story.append(Paragraph("<b>HOUSEHOLD CARBON EMISSION REPORT</b>", styles["Title"]))
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 12))
+
+        # Section 1: House Information
+        story.append(Paragraph("<b>1. House Information</b>", styles["Heading2"]))
         story.append(Paragraph(f"House Name: {house_name}", styles["Normal"]))
         story.append(Paragraph(f"Owner Name: {owner_name}", styles["Normal"]))
         story.append(Paragraph(f"House Number: {house_no}", styles["Normal"]))
         story.append(Paragraph(f"Date: {datetime.now().strftime('%d-%m-%Y')}", styles["Normal"]))
         story.append(Spacer(1, 10))
 
-        story.append(Paragraph(f"Gross CO₂ Emission: {gross_CO2:.1f} kg/year", styles["Normal"]))
-        story.append(Paragraph(f"Net CO₂ Emission: {net_CO2:.1f} kg/year", styles["Normal"]))
-        story.append(Paragraph(f"Per Capita CO₂: {per_capita:.1f} kg/year", styles["Normal"]))
-        story.append(Paragraph(f"Highest Source: {highest_source}", styles["Normal"]))
-        story.append(Paragraph(f"Suggestion: {suggestions[highest_source]}", styles["Normal"]))
+        # Section 2: Annual Carbon Emissions
+        story.append(Paragraph("<b>2. Annual Carbon Emissions (kg/year)</b>", styles["Heading2"]))
+        story.append(Paragraph(f"Electricity: {electricity_CO2:.2f}", styles["Normal"]))
+        story.append(Paragraph(f"Cooking: {cooking_CO2:.2f}", styles["Normal"]))
+        story.append(Paragraph(f"Water: {water_CO2:.2f}", styles["Normal"]))
+        story.append(Paragraph(f"Transport: {transport_CO2:.2f}", styles["Normal"]))
+        story.append(Paragraph(f"Waste: {waste_CO2:.2f}", styles["Normal"]))
+        story.append(Paragraph(f"Digital: {digital_CO2:.2f}", styles["Normal"]))
+        story.append(Spacer(1, 10))
+
+        # Section 3: Emission Contribution
+        story.append(Paragraph("<b>3. Emission Contribution (%)</b>", styles["Heading2"]))
+        for key, value in percent.items():
+            story.append(Paragraph(f"{key}: {value:.2f} %", styles["Normal"]))
+
+        story.append(Spacer(1, 10))
+        story.append(Paragraph(f"<b>Net CO₂ Emissions:</b> {net_CO2:.2f} kg/year", styles["Normal"]))
+        story.append(Spacer(1, 6))
+
+        # Colored rating line
+        story.append(
+            Paragraph(
+                f'<font color="{rating_color}"><b>Overall Rating: {rating}</b></font>',
+                styles["Normal"]
+            )
+        )
+        story.append(Spacer(1, 10))
+
+        # Section 4: Key Suggestion
+        story.append(Paragraph("<b>4. Key Suggestion</b>", styles["Heading2"]))
+        story.append(Paragraph(suggestions[highest_source], styles["Normal"]))
+        story.append(Spacer(1, 10))
+
+        # Section 5: Conclusion
+        story.append(Paragraph("<b>5. Conclusion</b>", styles["Heading2"]))
+        story.append(
+            Paragraph(
+                "This assessment highlights the household’s carbon emission pattern. "
+                "By adopting sustainable practices and reducing high-emission activities, "
+                "the household can significantly contribute towards achieving carbon neutrality "
+                "and combating climate change.",
+                styles["Normal"]
+            )
+        )
 
         doc.build(story)
         buffer.seek(0)
